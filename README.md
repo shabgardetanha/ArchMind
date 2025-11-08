@@ -1,3 +1,4 @@
+Microsoft Copilot:
 حتماً! در ادامه یک بلاک کد کامل به زبان Python آماده کرده‌ام که با اجرای آن، تمام فایل‌های پروژه ArchMind را در ساختار مناسب بسازد. این اسکریپت را می‌توانی در محیطی مثل Replit یا لوکال اجرا کنی تا کل پروژه به‌صورت خودکار ساخته شود.
 
 🧱 بلاک کد ساخت کامل پروژه ArchMind
@@ -107,3 +108,129 @@ def run(self):
     security = SecurityScanner()
     devops = DevOpsAnalyzer()
     insight = InsightEngine()
+
+telemetry_data = {"spans": [{"service": "auth", "duration_ms": 150}, {"service": "billing", "duration_ms": 200}]}
+        logs = ["INFO startup", "ERROR auth failed", "timeout billing"]
+    report = {
+        "languages": discovery.detect_languages(),
+        "architecture": discovery.detect_architecture(),
+        "services": discovery.map_services(),
+        "patterns": analyzer.scan_patterns(),
+        "complexity": analyzer.measure_complexity(),
+        "contexts": modeler.extract_contexts(),
+        "event_flow": modeler.map_event_flow(),
+        "runtime": profiler.analyze_tracing(telemetry_data),
+        "failures": profiler.scan_logs(logs),
+        "secrets": security.find_secrets(self.project_path),
+        "auth_model": security.evaluate_auth_model(self.project_path),
+        "pipeline": devops.parse_pipelines(f"{self.project_path}/.github/workflows/main.yml"),
+        "risks": devops.assess_risks(devops.parse_pipelines(f"{self.project_path}/.github/workflows/main.yml")),
+        "priorities": insight.prioritize_risks({
+            "auth latency": 180,
+            "secrets exposed": ["JWT_SECRET"],
+            "low test coverage": True
+        })
+    }
+
+    return report
+
+
+"""
+}
+
+modules = {
+    "discovery.py": """import os
+class DiscoveryEngine:
+    def init(self, root_path: str):
+        self.root_path = root_path
+def detect_languages(self) -> dict:
+    extensions = {".py": "Python", ".yaml": "YAML", ".java": "Java"}
+    result = {}
+    for dirpath, _, filenames in os.walk(self.root_path):
+        for file in filenames:
+            ext = os.path.splitext(file)[1]
+            if ext in extensions:
+                lang = extensions[ext]
+                result[lang] = result.get(lang, 0) + 1
+    return result
+
+def detect_architecture(self) -> str:
+    if os.path.exists(os.path.join(self.root_path, "services")):
+        return "Microservices"
+    return "Unknown"
+
+def map_services(self) -> list:
+    services = []
+    for dirpath, _, filenames in os.walk(self.root_path):
+        if "Dockerfile" in filenames:
+            services.append(os.path.basename(dirpath))
+    return services
+
+
+""",
+    "analyzer.py": """import os, ast
+class CodeAnalyzer:
+    def init(self, codebase_path: str):
+        self.codebase_path = codebase_path
+def scan_patterns(self) -> dict:
+    patterns = {"Saga": 0}
+    for dirpath, _, filenames in os.walk(self.codebase_path):
+        for file in filenames:
+            if file.endswith(".py"):
+                with open(os.path.join(dirpath, file), "r", encoding="utf-8") as f:
+                    try:
+                        tree = ast.parse(f.read())
+                        for node in ast.walk(tree):
+                            if isinstance(node, ast.ClassDef) and "Saga" in node.name:
+                                patterns["Saga"] += 1
+                    except:
+                        continue
+    return patterns
+
+def measure_complexity(self) -> dict:
+    total, count = 0, 0
+    for dirpath, _, filenames in os.walk(self.codebase_path):
+        for file in filenames:
+            if file.endswith(".py"):
+                with open(os.path.join(dirpath, file), "r", encoding="utf-8") as f:
+                    try:
+                        tree = ast.parse(f.read())
+                        for node in ast.walk(tree):
+                            if isinstance(node, ast.FunctionDef):
+                                count += 1
+                                total += len(list(ast.walk(node)))
+                    except:
+                        continue
+
+return {"avg_complexity": round(total / count, 2) if count else 0, "functions": count}
+""",
+    "domain.py": """import os
+class DomainModeler:
+    def init(self, codebase_path: str):
+        self.codebase_path = codebase_path
+def extract_contexts(self) -> list:
+    contexts = []
+    for dirpath, _, _ in os.walk(self.codebase_path):
+        if "domain" in dirpath or "context" in dirpath:
+            contexts.append(os.path.basename(dirpath))
+    return list(set(contexts))
+
+def map_event_flow(self) -> dict:
+    commands, events, handlers = 0, 0, 0
+    for dirpath, _, filenames in os.walk(self.codebase_path):
+        for file in filenames:
+            if file.endswith(".py"):
+                with open(os.path.join(dirpath, file), "r", encoding="utf-8") as f:
+                    content = f.read()
+                    commands += content.count("Command")
+                    events += content.count("Event")
+                    handlers += content.count("Handler")
+    return {"commands": commands, "events": events, "handlers": handlers}
+
+
+""",
+    "runtime.py": """class RuntimeProfiler:
+    def analyze_tracing(self, telemetry_data: dict) -> dict:
+        latencies = [span["duration_ms"] for span in telemetry_data.get("spans", [])]
+        avg = sum(latencies) / len(latencies) if latencies else 0
+        critical = sorted(telemetry_data.get("spans", []), key=lambda x: x["duration_ms"], reverse=True)[:3
